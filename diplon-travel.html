@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0f1623"/>
+<title>Diplon Travel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --bg:#0f1623;--bg2:#161f30;--bg3:#1e2a3e;
+    --border:#243044;--border2:#2d3f5a;
+    --gold:#f5a623;--gold2:#e8941a;--gold-dim:rgba(245,166,35,0.12);
+    --teal:#2dd4bf;--teal-dim:rgba(45,212,191,0.1);
+    --red:#f87171;--red-dim:rgba(248,113,113,0.1);
+    --green:#4ade80;--green-dim:rgba(74,222,128,0.1);
+    --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.1);
+    --text:#e8edf5;--text2:#94a3b8;--text3:#5a7090;
+    --serif:'DM Serif Display',serif;--sans:'Outfit',sans-serif;
+    --nav-h:64px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;}
+
+  /* ── Login Screen ── */
+  #login-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;}
+  .login-logo{font-size:56px;margin-bottom:16px;}
+  .login-title{font-family:var(--serif);font-size:30px;color:var(--gold);margin-bottom:8px;}
+  .login-sub{font-size:14px;color:var(--text3);margin-bottom:40px;line-height:1.6;}
+  .g-signin-wrap{margin-bottom:16px;}
+  .login-note{font-size:11px;color:var(--text3);max-width:260px;line-height:1.6;}
+  .login-divider{display:flex;align-items:center;gap:10px;margin:20px 0;width:100%;max-width:300px;}
+  .login-divider span{font-size:11px;color:var(--text3);}
+  .login-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+  .btn-skip{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:12px;padding:12px 24px;font-size:13px;cursor:pointer;font-family:var(--sans);font-weight:500;}
+
+  /* ── App Layout ── */
+  #app{display:flex;flex-direction:column;height:100vh;display:none;}
+  #topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  #topbar .brand{font-family:var(--serif);font-size:20px;color:var(--gold);}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold-dim);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;}
+  .user-avatar img{width:100%;height:100%;object-fit:cover;}
+  .user-avatar span{color:var(--gold);font-weight:700;font-size:13px;}
+  #content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 8px);}
+  #navbar{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;transition:color .2s;padding:8px 0;}
+  .nav-item.active{color:var(--gold);}
+  .nav-item svg{width:22px;height:22px;}
+
+  /* ── Pages ── */
+  .page{display:none;padding:16px;animation:fadeIn .2s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ── Cards ── */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .card-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:10px;}
+
+  /* ── Stats ── */
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;}
+  .stat-card .label{font-size:11px;color:var(--text3);font-weight:500;margin-bottom:6px;}
+  .stat-card .value{font-family:var(--serif);font-size:22px;color:var(--text);}
+  .stat-card.gold{border-color:rgba(245,166,35,.3);background:linear-gradient(135deg,var(--bg2),rgba(245,166,35,.06));}
+  .stat-card.teal{border-color:rgba(45,212,191,.3);background:linear-gradient(135deg,var(--bg2),rgba(45,212,191,.06));}
+  .stat-card.red{border-color:rgba(248,113,113,.3);background:linear-gradient(135deg,var(--bg2),rgba(248,113,113,.06));}
+  .stat-card.green{border-color:rgba(74,222,128,.3);background:linear-gradient(135deg,var(--bg2),rgba(74,222,128,.06));}
+
+  /* ── Buttons ── */
+  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .sec-title{font-family:var(--serif);font-size:18px;}
+  .btn-add{background:var(--gold);color:#0f1623;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;}
+  .search-bar{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;width:100%;color:var(--text);font-size:14px;font-family:var(--sans);margin-bottom:12px;outline:none;}
+  .search-bar:focus{border-color:var(--gold);}
+  .filter-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+  .filter-row::-webkit-scrollbar{display:none;}
+  .pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--sans);font-weight:500;}
+  .pill.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+
+  /* ── Booking Cards ── */
+  .booking-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;}
+  .booking-card:active{border-color:var(--gold);}
+  .bc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .bc-name{font-weight:600;font-size:15px;line-height:1.3;}
+  .bc-pkg{font-size:12px;color:var(--text3);margin-top:2px;}
+  .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.3px;white-space:nowrap;}
+  .badge.confirmed{background:var(--green-dim);color:var(--green);}
+  .badge.pending{background:var(--gold-dim);color:var(--gold);}
+  .badge.completed{background:var(--blue-dim);color:var(--blue);}
+  .badge.cancelled{background:var(--red-dim);color:var(--red);}
+  .bc-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  .bc-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:3px;}
+  .bc-item strong{color:var(--text2);}
+  .bc-footer{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+  .price{font-weight:700;font-size:15px;}
+  .due.has-due{color:var(--red);font-size:12px;font-weight:600;}
+  .due.paid{color:var(--green);font-size:12px;font-weight:600;}
+
+  /* ── Driver card ── */
+  .driver-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .driver-card:active{border-color:var(--gold);}
+  .driver-avatar{width:44px;height:44px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:var(--gold);flex-shrink:0;}
+  .d-name{font-weight:600;font-size:15px;margin-bottom:3px;}
+  .d-meta{font-size:12px;color:var(--text3);}
+
+  /* ── Driver Picker ── */
+  .driver-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:200px;overflow-y:auto;padding:4px 0;}
+  .dp-option{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:border-color .15s,background .15s;}
+  .dp-option:active,.dp-option.selected{border-color:var(--gold);background:var(--gold-dim);}
+  .dp-name{font-size:13px;font-weight:600;color:var(--text);}
+  .dp-vehicle{font-size:11px;color:var(--text3);margin-top:2px;}
+  .dp-none{background:var(--bg3);border:1.5px dashed var(--border2);border-radius:10px;padding:10px;cursor:pointer;text-align:center;color:var(--text3);font-size:13px;grid-column:span 2;}
+  .dp-none.selected{border-color:var(--red);color:var(--red);}
+
+  /* ── Modal ── */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:flex-end;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--bg2);border-radius:20px 20px 0 0;border-top:1px solid var(--border);width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;animation:slideUp .3s ease;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+  .modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+  .modal-title{font-family:var(--serif);font-size:20px;margin-bottom:18px;}
+
+  /* ── Form ── */
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;}
+  .form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold);}
+  .form-select{appearance:none;}
+  .form-textarea{resize:vertical;min-height:70px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .btn-submit{width:100%;background:var(--gold);color:#0f1623;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);margin-top:6px;}
+  .btn-cancel{width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:14px;cursor:pointer;font-family:var(--sans);margin-top:8px;}
+
+  /* ── Detail ── */
+  .detail-back{display:flex;align-items:center;gap:8px;color:var(--gold);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:16px;}
+  .detail-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+  .dr-label{font-size:13px;color:var(--text3);}
+  .dr-value{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:60%;}
+  .action-row{display:flex;gap:10px;margin-top:16px;}
+  .btn-edit{flex:1;background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+  .btn-delete{flex:1;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+
+  /* ── Misc ── */
+  .empty{text-align:center;padding:48px 20px;color:var(--text3);}
+  .empty .e-icon{font-size:40px;margin-bottom:12px;}
+  .loading{text-align:center;padding:32px;color:var(--text3);font-size:14px;}
+  .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:500;z-index:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+  #toast.show{opacity:1;}
+  #toast.success{border-color:var(--green);color:var(--green);}
+  #toast.error{border-color:var(--red);color:var(--red);}
+  .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;}
+  .offline-dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;margin-right:5px;}
+  .page-header{margin-bottom:18px;}
+  .page-header h1{font-family:var(--serif);font-size:24px;}
+  .page-header p{font-size:13px;color:var(--text3);margin-top:3px;}
+  .report-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+  .report-row:last-child{border-bottom:none;}
+  .rr-period{font-size:14px;font-weight:600;}
+  .rr-count{font-size:12px;color:var(--text3);}
+  .rr-amount{font-family:var(--serif);font-size:16px;color:var(--gold);}
+  .setting-row{padding:14px 0;border-bottom:1px solid var(--border);}
+  .setting-row:last-child{border-bottom:none;}
+  .s-label{font-size:14px;font-weight:500;margin-bottom:4px;}
+  .s-desc{font-size:12px;color:var(--text3);margin-bottom:8px;}
+
+  /* user menu */
+  .user-menu{position:fixed;top:60px;right:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:8px;z-index:300;min-width:200px;display:none;}
+  .user-menu.open{display:block;}
+  .um-header{padding:10px 12px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+  .um-name{font-weight:600;font-size:14px;}
+  .um-email{font-size:12px;color:var(--text3);margin-top:2px;}
+  .um-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text2);}
+  .um-item:hover{background:var(--bg3);}
+  .um-item.logout{color:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-logo">🏔</div>
+  <div class="login-title">Diplon Travel</div>
+  <div class="login-sub">Sign in with your Google account<br/>to access your travel management system</div>
+  <div class="g-signin-wrap">
+    <div id="g_id_onload"
+      data-client_id="GOOGLE_CLIENT_ID_HERE"
+      data-context="signin"
+      data-ux_mode="popup"
+      data-callback="handleGoogleLogin"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-shape="pill"
+      data-theme="filled_blue"
+      data-text="signin_with"
+      data-size="large"
+      data-logo_alignment="left">
+    </div>
+  </div>
+  <div class="login-divider"><hr/><span>OR</span><hr/></div>
+  <button class="btn-skip" onclick="skipLogin()">Continue without Google Sign-In</button>
+  <div class="login-note" style="margin-top:16px">
+    Google Sign-In requires a Client ID set up in Settings.<br/>You can still use the app without signing in.
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+  <div id="topbar">
+    <span class="brand">🏔 Diplon Travel</span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="online-indicator" style="font-size:11px;color:var(--text3)"></span>
+      <div class="user-avatar" onclick="toggleUserMenu()" id="user-avatar-btn">
+        <span id="user-initials">D</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- User menu -->
+  <div class="user-menu" id="user-menu">
+    <div class="um-header">
+      <div class="um-name" id="um-name">Guest User</div>
+      <div class="um-email" id="um-email">Not signed in</div>
+    </div>
+    <div class="um-item" onclick="syncAll();toggleUserMenu()">⟳ Sync Now</div>
+    <div class="um-item" onclick="navigate('settings');toggleUserMenu()">⚙ Settings</div>
+    <div class="um-item logout" onclick="logout()">⎋ Sign Out</div>
+  </div>
+
+  <div id="content">
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p id="dash-date"></p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card gold"><div class="label">Total Bookings</div><div class="value" id="s-total">—</div></div>
+        <div class="stat-card teal"><div class="label">Today's Tours</div><div class="value" id="s-today">—</div></div>
+        <div class="stat-card green"><div class="label">Revenue Collected</div><div class="value" id="s-revenue">—</div></div>
+        <div class="stat-card red"><div class="label">Outstanding</div><div class="value" id="s-outstanding">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Upcoming Tours</div>
+        <div id="upcoming-list"><div class="loading"><span class="spinner"></span>Loading…</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recent Bookings</div>
+        <div id="recent-list"><div class="loading"><span class="spinner"></span>Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div id="page-bookings" class="page">
+      <div class="sec-header">
+        <div class="sec-title">Bookings</div>
+        <button class="btn-add" onclick="openBookingModal()">＋ Add</button>
+      </div>
+      <input class="search-bar" placeholder="🔍  Search customer, package, driver…" oninput="filterBookings(this.value)" id="booking-search"/>
+      <div class="filter-row" id="status-filters">
+        <div class="pill active" onclick="setStatusFilter(this,'')">All</div>
+        <div class="pill" onclick="setStatusFilter(this,'confirmed')">Confirmed</div>
+        <div class="pill" onclick="setStatusFilter(this,'pending')">Pending</div>
+        <div class="pill" onclick="setStatusFilter(this,'completed')">Completed</div>
+        <div class="pill" onclick="setStatusFilter(this,'cancelled')">Cancelled</div>
+      </div>
+      <div id="bookings-list"><div class="loading"><span class="spinner"></span>Loading…</div></div>
+    </div>
+
+    <!-- DRIVERS -->
+    <div id="page-drivers" class="page">
+      <div class="sec-header">
+        <div class="sec-title">Drivers</div>
+        <button class="btn-add" onclick="openModal('driver')">＋ Add</button>
+      </div>
+      <input class="search-bar" placeholder="🔍  Search driver, vehicle…" oninput="filterDrivers(this.value)"/>
+      <div id="drivers-list"><div class="loading"><span class="spinner"></span>Loading…</div></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="page-header"><h1>Reports</h1><p>Financial overview</p></div>
+      <div class="stats-grid">
+        <div class="stat-card gold"><div class="label">Total Revenue</div><div class="value" id="r-total">—</div></div>
+        <div class="stat-card red"><div class="label">Pending Due</div><div class="value" id="r-pending">—</div></div>
+      </div>
+      <div class="card"><div class="card-title">Driver Collections</div><div id="driver-collections"></div></div>
+      <div class="card"><div class="card-title">Monthly Revenue</div><div id="monthly-report"></div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="page-header"><h1>Settings</h1></div>
+      <div class="card">
+        <div class="card-title">Google Sheets Connection</div>
+        <div class="setting-row">
+          <div class="s-label">Apps Script URL</div>
+          <div class="s-desc">Your deployed Google Apps Script Web App URL</div>
+          <input class="form-input" id="api-url-input" placeholder="https://script.google.com/macros/s/…/exec" style="margin-bottom:10px"/>
+          <button class="btn-submit" style="margin-top:0" onclick="saveApiUrl()">Save & Connect</button>
+        </div>
+        <div class="setting-row">
+          <div class="s-label">Status</div>
+          <div id="conn-status" style="font-size:13px;color:var(--text3);margin-top:4px">Not tested</div>
+          <button class="btn-cancel" style="margin-top:8px" onclick="testConnection()">Test Connection</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Google Sign-In (Optional)</div>
+        <div class="setting-row">
+          <div class="s-label">OAuth Client ID</div>
+          <div class="s-desc">From Google Cloud Console → APIs & Services → Credentials</div>
+          <input class="form-input" id="client-id-input" placeholder="xxxxxxxx.apps.googleusercontent.com" style="margin-bottom:10px"/>
+          <button class="btn-submit" style="margin-top:0" onclick="saveClientId()">Save Client ID</button>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text3);line-height:1.7">
+          <strong style="color:var(--text2)">How to get Client ID:</strong><br/>
+          1. Go to console.cloud.google.com<br/>
+          2. APIs & Services → Credentials<br/>
+          3. Create OAuth 2.0 Client ID → Web App<br/>
+          4. Add your app's URL to Authorised origins<br/>
+          5. Paste the Client ID above
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Data</div>
+        <div class="setting-row">
+          <div class="s-label">Clear Cache</div>
+          <div class="s-desc">Force fresh data from Google Sheets</div>
+          <button class="btn-cancel" onclick="clearCache()">Clear Cache</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">Diplon Travel Management v2.0</div>
+    </div>
+  </div>
+
+  <nav id="navbar">
+    <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="navigate('bookings')" id="nav-bookings">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span>Bookings</span>
+    </div>
+    <div class="nav-item" onclick="navigate('drivers')" id="nav-drivers">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span>Drivers</span>
+    </div>
+    <div class="nav-item" onclick="navigate('reports')" id="nav-reports">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span>Reports</span>
+    </div>
+    <div class="nav-item" onclick="navigate('settings')" id="nav-settings">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Settings</span>
+    </div>
+  </nav>
+</div>
+
+<!-- ══ BOOKING MODAL ══ -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="booking-modal-title">New Booking</div>
+    <div class="form-group"><label class="form-label">Customer Name *</label><input class="form-input" id="b-name" placeholder="Full name"/></div>
+    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="b-phone" placeholder="98XXXXXXXX" type="tel"/></div>
+    <div class="form-group"><label class="form-label">Package / Tour Name *</label><input class="form-input" id="b-pkg" placeholder="e.g. Sailung–Kalinchowk (1N/2D)"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Travel Date *</label><input class="form-input" id="b-date" type="date"/></div>
+      <div class="form-group"><label class="form-label">Pax / Room Type</label><input class="form-input" id="b-pax" placeholder="e.g. 4 person"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Pickup Location</label><input class="form-input" id="b-pickup" placeholder="Pickup point"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Total Amount (Rs)</label><input class="form-input" id="b-total" type="number" placeholder="0" oninput="calcDue()"/></div>
+      <div class="form-group"><label class="form-label">Advance Paid (Rs)</label><input class="form-input" id="b-advance" type="number" placeholder="0" oninput="calcDue()"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Remaining Due</label><input class="form-input" id="b-due" readonly style="color:var(--text3)" placeholder="Auto-calculated"/></div>
+
+    <!-- DRIVER ASSIGNMENT -->
+    <div class="form-group">
+      <label class="form-label">Assign Driver</label>
+      <div id="driver-picker-wrap"></div>
+      <input type="hidden" id="b-driver-id"/>
+      <input type="hidden" id="b-driver-name"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="b-status">
+        <option value="confirmed">Confirmed</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Notes / Remarks</label><textarea class="form-textarea" id="b-notes" placeholder="Any additional notes…"></textarea></div>
+    <input type="hidden" id="b-id"/>
+    <button class="btn-submit" onclick="saveBooking()">Save Booking</button>
+    <button class="btn-cancel" onclick="closeModal('booking')">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ DRIVER MODAL ══ -->
+<div class="modal-overlay" id="modal-driver">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="driver-modal-title">Add Driver</div>
+    <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="d-name" placeholder="Driver full name"/></div>
+    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="d-phone" placeholder="98XXXXXXXX" type="tel"/></div>
+    <div class="form-group"><label class="form-label">Vehicle Type</label><input class="form-input" id="d-vtype" placeholder="e.g. Scorpio, EV Jeep, Van"/></div>
+    <div class="form-group"><label class="form-label">Vehicle Number</label><input class="form-input" id="d-vnum" placeholder="Ba 1 Cha XXXX"/></div>
+    <div class="form-group"><label class="form-label">License Number</label><input class="form-input" id="d-license" placeholder="License number"/></div>
+    <input type="hidden" id="d-id"/>
+    <button class="btn-submit" onclick="saveDriver()">Save Driver</button>
+    <button class="btn-cancel" onclick="closeModal('driver')">Cancel</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let API_URL = localStorage.getItem('diplon_api_url') || '';
+let allBookings = JSON.parse(localStorage.getItem('diplon_bookings') || '[]');
+let allDrivers  = JSON.parse(localStorage.getItem('diplon_drivers')  || '[]');
+let filteredBookings = [...allBookings];
+let currentStatusFilter = '';
+let currentPage = 'dashboard';
+let currentUser = JSON.parse(localStorage.getItem('diplon_user') || 'null');
+let selectedDriverId = '';
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('api-url-input').value = API_URL;
+  document.getElementById('client-id-input').value = localStorage.getItem('diplon_client_id') || '';
+  updateOnlineStatus();
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('user-menu');
+    if (!document.getElementById('user-avatar-btn').contains(e.target)) menu.classList.remove('open');
+  });
+
+  if (currentUser) {
+    showApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+});
+
+// ══════════════════════════════════
+// GOOGLE LOGIN
+// ══════════════════════════════════
+function handleGoogleLogin(response) {
+  try {
+    const payload = parseJwt(response.credential);
+    currentUser = { name: payload.name, email: payload.email, picture: payload.picture };
+    localStorage.setItem('diplon_user', JSON.stringify(currentUser));
+    showApp();
+    showToast('✓ Welcome, ' + payload.name.split(' ')[0] + '!', 'success');
+  } catch(e) { showToast('Login failed', 'error'); }
+}
+
+function parseJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(atob(base64));
+}
+
+function skipLogin() {
+  currentUser = { name: 'Guest', email: 'guest@diplon.com', picture: null };
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  updateUserUI();
+  loadDashboard();
+  if (API_URL) syncAll();
+}
+
+function updateUserUI() {
+  if (!currentUser) return;
+  document.getElementById('um-name').textContent = currentUser.name;
+  document.getElementById('um-email').textContent = currentUser.email;
+  const initials = (currentUser.name || 'G').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2);
+  const avatarEl = document.getElementById('user-initials');
+  const avatarBtn = document.getElementById('user-avatar-btn');
+  if (currentUser.picture) {
+    avatarBtn.innerHTML = `<img src="${currentUser.picture}" onerror="this.parentElement.innerHTML='<span>${initials}</span>'" referrerpolicy="no-referrer"/>`;
+  } else {
+    avatarEl.textContent = initials;
+  }
+}
+
+function logout() {
+  if (typeof google !== 'undefined' && google.accounts) {
+    try { google.accounts.id.disableAutoSelect(); } catch(e) {}
+  }
+  localStorage.removeItem('diplon_user');
+  currentUser = null;
+  document.getElementById('user-menu').classList.remove('open');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  showToast('Signed out', '');
+}
+
+function toggleUserMenu() {
+  document.getElementById('user-menu').classList.toggle('open');
+}
+
+// ══════════════════════════════════
+// ONLINE STATUS
+// ══════════════════════════════════
+function updateOnlineStatus() {
+  const el = document.getElementById('online-indicator');
+  el.innerHTML = navigator.onLine
+    ? '<span class="online-dot"></span>Online'
+    : '<span class="offline-dot"></span>Offline';
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  currentPage = page;
+  if (page==='bookings') renderBookings();
+  if (page==='drivers')  renderDrivers();
+  if (page==='reports')  renderReports();
+}
+
+// ══════════════════════════════════
+// API
+// ══════════════════════════════════
+async function apiCall(action, data={}) {
+  if (!API_URL) return {success:false, error:'No API URL — go to Settings'};
+  try {
+    const res = await fetch(API_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action,...data})
+    });
+    return await res.json();
+  } catch(e) { return {success:false, error:e.message}; }
+}
+
+async function syncAll() {
+  if (!navigator.onLine) return;
+  showToast('Syncing…','');
+  try {
+    const [bRes, dRes] = await Promise.all([apiCall('getBookings'), apiCall('getDrivers')]);
+    if (bRes.success && bRes.data) {
+      allBookings = bRes.data; filteredBookings = [...allBookings];
+      localStorage.setItem('diplon_bookings', JSON.stringify(allBookings));
+    }
+    if (dRes.success && dRes.data) {
+      allDrivers = dRes.data;
+      localStorage.setItem('diplon_drivers', JSON.stringify(allDrivers));
+    }
+    loadDashboard();
+    if (currentPage==='bookings') renderBookings();
+    if (currentPage==='drivers')  renderDrivers();
+    if (currentPage==='reports')  renderReports();
+    showToast('✓ Synced','success');
+  } catch(e) { showToast('Sync failed','error'); }
+}
+
+// ══════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════
+function loadDashboard() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('s-total').textContent = allBookings.length;
+  document.getElementById('s-today').textContent = allBookings.filter(b=>b.travelDate===today).length;
+  document.getElementById('s-revenue').textContent = 'Rs '+fmt(allBookings.reduce((s,b)=>s+(parseFloat(b.advancePaid)||0),0));
+  document.getElementById('s-outstanding').textContent = 'Rs '+fmt(allBookings.reduce((s,b)=>s+Math.max(0,parseFloat(b.remainingDue)||0),0));
+
+  const upcoming = allBookings.filter(b=>b.travelDate>=today&&b.status!=='cancelled')
+    .sort((a,b)=>a.travelDate.localeCompare(b.travelDate)).slice(0,6);
+  const upEl = document.getElementById('upcoming-list');
+  upEl.innerHTML = upcoming.length===0
+    ? '<div style="color:var(--text3);font-size:13px;padding:8px 0">No upcoming tours</div>'
+    : upcoming.map(b=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navigate('bookings');setTimeout(()=>viewBooking('${b.id}'),50)">
+        <div>
+          <div style="font-size:13px;font-weight:600">${esc(b.customerName)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(b.packageName)} · ${fmtDate(b.travelDate)}</div>
+          ${b.assignedDriverName?`<div style="font-size:11px;color:var(--gold);margin-top:2px">🚗 ${esc(b.assignedDriverName)}</div>`:''}
+        </div>
+        <span class="badge ${b.status}">${b.status}</span>
+      </div>`).join('');
+
+  const recent = [...allBookings].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).slice(0,5);
+  const recEl = document.getElementById('recent-list');
+  recEl.innerHTML = recent.length===0
+    ? '<div style="color:var(--text3);font-size:13px;padding:8px 0">No bookings yet</div>'
+    : recent.map(b=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navigate('bookings');setTimeout(()=>viewBooking('${b.id}'),50)">
+        <div>
+          <div style="font-size:13px;font-weight:600">${esc(b.customerName)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(b.packageName)}</div>
+        </div>
+        <div style="font-family:var(--serif);font-size:15px;color:var(--gold)">Rs ${fmt(b.totalPrice)}</div>
+      </div>`).join('');
+}
+
+// ══════════════════════════════════
+// BOOKINGS
+// ══════════════════════════════════
+function renderBookings(list) {
+  const items = list||filteredBookings;
+  const el = document.getElementById('bookings-list');
+  if (!el) return;
+  if (items.length===0) { el.innerHTML='<div class="empty"><div class="e-icon">📋</div><div class="e-text">No bookings found</div></div>'; return; }
+  el.innerHTML = items.map(b=>`
+    <div class="booking-card" onclick="viewBooking('${b.id}')">
+      <div class="bc-top">
+        <div><div class="bc-name">${esc(b.customerName)}</div><div class="bc-pkg">${esc(b.packageName)}</div></div>
+        <span class="badge ${b.status}">${b.status}</span>
+      </div>
+      <div class="bc-meta">
+        <div class="bc-item">📅 <strong>${fmtDate(b.travelDate)}</strong></div>
+        <div class="bc-item">👥 <strong>${esc(b.numberOfPax||b.paxType||'—')}</strong></div>
+        ${b.assignedDriverName?`<div class="bc-item">🚗 <strong>${esc(b.assignedDriverName)}</strong></div>`:''}
+      </div>
+      <div class="bc-footer">
+        <div class="price">Rs ${fmt(b.totalPrice)}</div>
+        <div class="due ${parseFloat(b.remainingDue)>0?'has-due':'paid'}">${parseFloat(b.remainingDue)>0?'Due: Rs '+fmt(b.remainingDue):'✓ Paid'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterBookings(q) {
+  const s = q.toLowerCase();
+  filteredBookings = allBookings.filter(b=>{
+    const ms = !currentStatusFilter||b.status===currentStatusFilter;
+    const mq = !s||(b.customerName||'').toLowerCase().includes(s)||(b.packageName||'').toLowerCase().includes(s)||(b.phone||'').includes(s)||(b.assignedDriverName||'').toLowerCase().includes(s)||(b.pickupLocation||'').toLowerCase().includes(s);
+    return ms&&mq;
+  });
+  renderBookings();
+}
+
+function setStatusFilter(el, status) {
+  document.querySelectorAll('#status-filters .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  currentStatusFilter = status;
+  filterBookings(document.getElementById('booking-search')?.value||'');
+}
+
+// ══════════════════════════════════
+// DRIVER PICKER
+// ══════════════════════════════════
+function renderDriverPicker(selectedId) {
+  selectedDriverId = selectedId || '';
+  const wrap = document.getElementById('driver-picker-wrap');
+  const drivers = allDrivers.filter(d => d.isActive !== false && d.isActive !== 'false');
+  wrap.innerHTML = `
+    <div class="driver-picker">
+      <div class="dp-none ${!selectedDriverId?'selected':''}" onclick="selectDriver('','')">— No Driver —</div>
+      ${drivers.map(d=>`
+        <div class="dp-option ${selectedDriverId===d.id?'selected':''}" onclick="selectDriver('${d.id}','${esc(d.name)}')">
+          <div class="dp-name">${esc(d.name)}</div>
+          <div class="dp-vehicle">${esc(d.vehicleType||'')} ${d.vehicleNumber?'· '+d.vehicleNumber:''}</div>
+        </div>`).join('')}
+    </div>
+    ${drivers.length===0?'<div style="font-size:12px;color:var(--text3);margin-top:8px">No drivers added yet — add from Drivers tab</div>':''}`;
+}
+
+function selectDriver(id, name) {
+  selectedDriverId = id;
+  document.getElementById('b-driver-id').value = id;
+  document.getElementById('b-driver-name').value = name;
+  document.querySelectorAll('.dp-option,.dp-none').forEach(el=>{
+    el.classList.remove('selected');
+    if (el.dataset && el.getAttribute('onclick')===`selectDriver('${id}','${name}')`) el.classList.add('selected');
+  });
+  // Re-render to show selection cleanly
+  renderDriverPicker(id);
+}
+
+// ══════════════════════════════════
+// BOOKING DETAIL
+// ══════════════════════════════════
+function viewBooking(id) {
+  const b = allBookings.find(x=>x.id===id);
+  if (!b) return;
+  const page = document.getElementById('page-bookings');
+  page.innerHTML = `
+    <div class="detail-back" onclick="backToBookings()">← Back</div>
+    <div class="card">
+      <div class="card-title">Booking</div>
+      ${dr('Customer',b.customerName)} ${dr('Phone',b.phone||'—')} ${dr('Package',b.packageName)}
+      ${dr('Travel Date',fmtDate(b.travelDate))} ${dr('Pax / Room',b.numberOfPax||b.paxType||'—')}
+      ${dr('Pickup',b.pickupLocation||'—')}
+      ${dr('Driver',b.assignedDriverName?`<span style="color:var(--gold)">🚗 ${esc(b.assignedDriverName)}</span>`:'—')}
+      ${dr('Status',`<span class="badge ${b.status}">${b.status}</span>`)}
+    </div>
+    <div class="card">
+      <div class="card-title">Payment</div>
+      ${dr('Total Amount','Rs '+fmt(b.totalPrice))}
+      ${dr('Advance Paid','Rs '+fmt(b.advancePaid))}
+      ${dr('Remaining Due',`<span style="color:${parseFloat(b.remainingDue)>0?'var(--red)':'var(--green)'}">Rs ${fmt(b.remainingDue)}</span>`)}
+    </div>
+    ${b.notes?`<div class="card"><div class="card-title">Notes</div><div style="font-size:14px;color:var(--text2);line-height:1.6">${esc(b.notes)}</div></div>`:''}
+    <div class="action-row">
+      <button class="btn-edit" onclick="editBooking('${b.id}')">✎ Edit</button>
+      <button class="btn-delete" onclick="deleteBooking('${b.id}')">🗑 Delete</button>
+    </div>`;
+}
+
+function dr(label, value) {
+  return `<div class="detail-row"><div class="dr-label">${label}</div><div class="dr-value">${value}</div></div>`;
+}
+
+function backToBookings() {
+  const page = document.getElementById('page-bookings');
+  page.innerHTML = `
+    <div class="sec-header"><div class="sec-title">Bookings</div><button class="btn-add" onclick="openBookingModal()">＋ Add</button></div>
+    <input class="search-bar" placeholder="🔍  Search customer, package, driver…" oninput="filterBookings(this.value)" id="booking-search"/>
+    <div class="filter-row" id="status-filters">
+      <div class="pill active" onclick="setStatusFilter(this,'')">All</div>
+      <div class="pill" onclick="setStatusFilter(this,'confirmed')">Confirmed</div>
+      <div class="pill" onclick="setStatusFilter(this,'pending')">Pending</div>
+      <div class="pill" onclick="setStatusFilter(this,'completed')">Completed</div>
+      <div class="pill" onclick="setStatusFilter(this,'cancelled')">Cancelled</div>
+    </div>
+    <div id="bookings-list"></div>`;
+  filteredBookings = [...allBookings];
+  renderBookings();
+}
+
+function openBookingModal() {
+  document.getElementById('booking-modal-title').textContent = 'New Booking';
+  document.getElementById('b-id').value = '';
+  ['b-name','b-phone','b-pkg','b-pax','b-pickup','b-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('b-total').value = '';
+  document.getElementById('b-advance').value = '';
+  document.getElementById('b-due').value = '';
+  document.getElementById('b-date').value = '';
+  document.getElementById('b-status').value = 'confirmed';
+  document.getElementById('b-driver-id').value = '';
+  document.getElementById('b-driver-name').value = '';
+  renderDriverPicker('');
+  document.getElementById('modal-booking').classList.add('open');
+}
+
+function editBooking(id) {
+  const b = allBookings.find(x=>x.id===id);
+  if (!b) return;
+  document.getElementById('booking-modal-title').textContent = 'Edit Booking';
+  document.getElementById('b-id').value = b.id;
+  document.getElementById('b-name').value = b.customerName||'';
+  document.getElementById('b-phone').value = b.phone||'';
+  document.getElementById('b-pkg').value = b.packageName||'';
+  document.getElementById('b-date').value = b.travelDate||'';
+  document.getElementById('b-pax').value = b.numberOfPax||b.paxType||'';
+  document.getElementById('b-pickup').value = b.pickupLocation||'';
+  document.getElementById('b-total').value = b.totalPrice||'';
+  document.getElementById('b-advance').value = b.advancePaid||'';
+  document.getElementById('b-due').value = 'Rs '+fmt(b.remainingDue);
+  document.getElementById('b-driver-id').value = b.assignedDriverId||'';
+  document.getElementById('b-driver-name').value = b.assignedDriverName||'';
+  document.getElementById('b-status').value = b.status||'confirmed';
+  document.getElementById('b-notes').value = b.notes||'';
+  renderDriverPicker(b.assignedDriverId||'');
+  document.getElementById('modal-booking').classList.add('open');
+}
+
+// ══════════════════════════════════
+// SAVE BOOKING
+// ══════════════════════════════════
+async function saveBooking() {
+  const id = document.getElementById('b-id').value;
+  const name = document.getElementById('b-name').value.trim();
+  const pkg  = document.getElementById('b-pkg').value.trim();
+  const date = document.getElementById('b-date').value;
+  if (!name||!pkg||!date) { showToast('Fill required fields (*)','error'); return; }
+  const total   = parseFloat(document.getElementById('b-total').value)||0;
+  const advance = parseFloat(document.getElementById('b-advance').value)||0;
+  const driverId   = document.getElementById('b-driver-id').value;
+  const driverName = document.getElementById('b-driver-name').value;
+  const data = {
+    customerName: name, phone: document.getElementById('b-phone').value,
+    packageName: pkg, travelDate: date,
+    numberOfPax: document.getElementById('b-pax').value||'1',
+    pickupLocation: document.getElementById('b-pickup').value,
+    totalPrice: total, advancePaid: advance, remainingDue: total-advance,
+    assignedDriverId: driverId, assignedDriverName: driverName,
+    status: document.getElementById('b-status').value,
+    notes: document.getElementById('b-notes').value
+  };
+  const btn = document.querySelector('#modal-booking .btn-submit');
+  btn.textContent='Saving…'; btn.disabled=true;
+  let res;
+  if (id) {
+    res = await apiCall('updateBooking',{id,...data});
+    const idx = allBookings.findIndex(b=>b.id===id);
+    if (idx!==-1) allBookings[idx] = {...allBookings[idx],...data};
+  } else {
+    res = await apiCall('createBooking',data);
+    const newId = (res.data&&res.data.id)||'local_'+Date.now();
+    allBookings.unshift({id:newId,...data,createdAt:new Date().toISOString()});
+  }
+  localStorage.setItem('diplon_bookings',JSON.stringify(allBookings));
+  filteredBookings = [...allBookings];
+  btn.textContent='Save Booking'; btn.disabled=false;
+  closeModal('booking');
+  backToBookings();
+  loadDashboard();
+  showToast(id?'✓ Booking updated':'✓ Booking created','success');
+}
+
+async function deleteBooking(id) {
+  if (!confirm('Delete this booking?')) return;
+  await apiCall('deleteBooking',{id});
+  allBookings = allBookings.filter(b=>b.id!==id);
+  filteredBookings = allBookings.filter(b=>b.id!==id);
+  localStorage.setItem('diplon_bookings',JSON.stringify(allBookings));
+  backToBookings(); loadDashboard();
+  showToast('✓ Deleted','success');
+}
+
+function calcDue() {
+  const t = parseFloat(document.getElementById('b-total').value)||0;
+  const a = parseFloat(document.getElementById('b-advance').value)||0;
+  document.getElementById('b-due').value = 'Rs '+fmt(t-a);
+}
+
+// ══════════════════════════════════
+// DRIVERS
+// ══════════════════════════════════
+function renderDrivers(list) {
+  const items = list||allDrivers;
+  const el = document.getElementById('drivers-list');
+  if (!el) return;
+  if (items.length===0) { el.innerHTML='<div class="empty"><div class="e-icon">🚗</div><div class="e-text">No drivers added yet</div></div>'; return; }
+  el.innerHTML = items.map(d=>`
+    <div class="driver-card" onclick="viewDriver('${d.id}')">
+      <div class="driver-avatar">${(d.name||'?')[0].toUpperCase()}</div>
+      <div style="flex:1">
+        <div class="d-name">${esc(d.name)}</div>
+        <div class="d-meta">${esc(d.vehicleType||'')}${d.vehicleNumber?' · '+d.vehicleNumber:''}</div>
+        <div class="d-meta">${esc(d.phone||'')}</div>
+      </div>
+      <span class="badge ${d.isActive===false||d.isActive==='false'?'cancelled':'confirmed'}">${d.isActive===false||d.isActive==='false'?'Inactive':'Active'}</span>
+    </div>`).join('');
+}
+
+function filterDrivers(q) {
+  const s = q.toLowerCase();
+  renderDrivers(allDrivers.filter(d=>(d.name||'').toLowerCase().includes(s)||(d.vehicleType||'').toLowerCase().includes(s)||(d.phone||'').includes(s)));
+}
+
+function viewDriver(id) {
+  const d = allDrivers.find(x=>x.id===id);
+  if (!d) return;
+  const trips = allBookings.filter(b=>b.assignedDriverId===id||b.assignedDriverName===d.name);
+  const collected = trips.reduce((s,b)=>s+(parseFloat(b.advancePaid)||0),0);
+  const page = document.getElementById('page-drivers');
+  page.innerHTML = `
+    <div class="detail-back" onclick="navigate('drivers')">← Back</div>
+    <div style="text-align:center;padding:20px 0">
+      <div class="driver-avatar" style="width:64px;height:64px;font-size:28px;margin:0 auto 12px">${(d.name||'?')[0].toUpperCase()}</div>
+      <div style="font-family:var(--serif);font-size:22px">${esc(d.name)}</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:4px">${esc(d.vehicleType||'')} ${d.vehicleNumber?'· '+d.vehicleNumber:''}</div>
+    </div>
+    <div class="card">
+      ${dr('Phone',d.phone||'—')} ${dr('Vehicle',d.vehicleType||'—')} ${dr('Plate',d.vehicleNumber||'—')}
+      ${dr('License',d.licenseNumber||'—')} ${dr('Total Trips',trips.length)} ${dr('Total Collected','Rs '+fmt(collected))}
+    </div>
+    <div class="card"><div class="card-title">Recent Trips</div>
+      ${trips.length===0?'<div style="color:var(--text3);font-size:13px">No trips yet</div>':
+        trips.slice(-5).reverse().map(b=>`
+          <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:600">${esc(b.customerName)}</div>
+            <div style="font-size:11px;color:var(--text3)">${esc(b.packageName)} · ${fmtDate(b.travelDate)}</div>
+            <div style="font-size:12px;color:var(--gold);margin-top:2px">Collected: Rs ${fmt(b.advancePaid)}</div>
+          </div>`).join('')}
+    </div>
+    <div class="action-row">
+      <button class="btn-edit" onclick="editDriver('${d.id}')">✎ Edit</button>
+      <button class="btn-delete" onclick="deleteDriver('${d.id}')">🗑 Remove</button>
+    </div>`;
+}
+
+function editDriver(id) {
+  const d = allDrivers.find(x=>x.id===id);
+  if (!d) return;
+  document.getElementById('driver-modal-title').textContent = 'Edit Driver';
+  document.getElementById('d-id').value = d.id;
+  document.getElementById('d-name').value = d.name||'';
+  document.getElementById('d-phone').value = d.phone||'';
+  document.getElementById('d-vtype').value = d.vehicleType||'';
+  document.getElementById('d-vnum').value = d.vehicleNumber||'';
+  document.getElementById('d-license').value = d.licenseNumber||'';
+  document.getElementById('modal-driver').classList.add('open');
+}
+
+async function saveDriver() {
+  const name = document.getElementById('d-name').value.trim();
+  if (!name) { showToast('Driver name required','error'); return; }
+  const id = document.getElementById('d-id').value;
+  const data = { name, phone:document.getElementById('d-phone').value, vehicleType:document.getElementById('d-vtype').value, vehicleNumber:document.getElementById('d-vnum').value, licenseNumber:document.getElementById('d-license').value, isActive:true };
+  const btn = document.querySelector('#modal-driver .btn-submit');
+  btn.textContent='Saving…'; btn.disabled=true;
+  if (id) {
+    await apiCall('updateDriver',{id,...data});
+    const idx = allDrivers.findIndex(d=>d.id===id);
+    if (idx!==-1) allDrivers[idx] = {...allDrivers[idx],...data};
+  } else {
+    const res = await apiCall('createDriver',data);
+    allDrivers.push({id:(res.data&&res.data.id)||'local_'+Date.now(),...data});
+  }
+  localStorage.setItem('diplon_drivers',JSON.stringify(allDrivers));
+  btn.textContent='Save Driver'; btn.disabled=false;
+  closeModal('driver');
+  navigate('drivers');
+  showToast('✓ Driver saved','success');
+}
+
+async function deleteDriver(id) {
+  if (!confirm('Remove this driver?')) return;
+  await apiCall('deleteDriver',{id});
+  allDrivers = allDrivers.filter(d=>d.id!==id);
+  localStorage.setItem('diplon_drivers',JSON.stringify(allDrivers));
+  navigate('drivers');
+  showToast('✓ Driver removed','success');
+}
+
+// ══════════════════════════════════
+// REPORTS
+// ══════════════════════════════════
+function renderReports() {
+  const total = allBookings.reduce((s,b)=>s+(parseFloat(b.totalPrice)||0),0);
+  const pending = allBookings.reduce((s,b)=>s+Math.max(0,parseFloat(b.remainingDue)||0),0);
+  document.getElementById('r-total').textContent = 'Rs '+fmt(total);
+  document.getElementById('r-pending').textContent = 'Rs '+fmt(pending);
+  const dMap={};
+  allBookings.forEach(b=>{
+    const n=b.assignedDriverName||'Unassigned';
+    if(!dMap[n]) dMap[n]={c:0,p:0,t:0};
+    dMap[n].c+=parseFloat(b.advancePaid)||0;
+    dMap[n].p+=Math.max(0,parseFloat(b.remainingDue)||0);
+    dMap[n].t++;
+  });
+  document.getElementById('driver-collections').innerHTML =
+    Object.entries(dMap).sort((a,b)=>b[1].c-a[1].c).map(([n,d])=>`
+      <div class="report-row">
+        <div><div class="rr-period">${esc(n)}</div><div class="rr-count">${d.t} trip${d.t!==1?'s':''} · Due: Rs ${fmt(d.p)}</div></div>
+        <div class="rr-amount">Rs ${fmt(d.c)}</div>
+      </div>`).join('') || '<div style="color:var(--text3);font-size:13px">No data</div>';
+  const mMap={};
+  allBookings.forEach(b=>{
+    const k=(b.travelDate||'').substring(0,7);
+    if(!k) return;
+    if(!mMap[k]) mMap[k]={r:0,c:0};
+    mMap[k].r+=parseFloat(b.totalPrice)||0; mMap[k].c++;
+  });
+  document.getElementById('monthly-report').innerHTML =
+    Object.entries(mMap).sort((a,b)=>b[0].localeCompare(a[0])).map(([p,m])=>`
+      <div class="report-row">
+        <div><div class="rr-period">${fmtMonth(p)}</div><div class="rr-count">${m.c} booking${m.c!==1?'s':''}</div></div>
+        <div class="rr-amount">Rs ${fmt(m.r)}</div>
+      </div>`).join('') || '<div style="color:var(--text3);font-size:13px">No data</div>';
+}
+
+// ══════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════
+function saveApiUrl() {
+  API_URL = document.getElementById('api-url-input').value.trim();
+  localStorage.setItem('diplon_api_url', API_URL);
+  showToast('✓ Saved! Syncing…','success');
+  syncAll();
+}
+
+function saveClientId() {
+  const id = document.getElementById('client-id-input').value.trim();
+  localStorage.setItem('diplon_client_id', id);
+  document.querySelector('#g_id_onload').setAttribute('data-client_id', id);
+  showToast('✓ Client ID saved. Reload to apply.','success');
+}
+
+async function testConnection() {
+  const url = document.getElementById('api-url-input').value.trim();
+  if (!url) { showToast('Enter URL first','error'); return; }
+  const el = document.getElementById('conn-status');
+  el.textContent = 'Testing…';
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    el.innerHTML = `<span style="color:var(--green)">✓ Connected: ${data.message||'OK'}</span>`;
+  } catch(e) {
+    el.innerHTML = `<span style="color:var(--red)">✗ Failed: ${e.message}</span>`;
+  }
+}
+
+function clearCache() {
+  if (!confirm('Clear cached data?')) return;
+  localStorage.removeItem('diplon_bookings');
+  localStorage.removeItem('diplon_drivers');
+  allBookings=[]; allDrivers=[]; filteredBookings=[];
+  showToast('Cache cleared','success');
+  syncAll();
+}
+
+// ══════════════════════════════════
+// MODALS
+// ══════════════════════════════════
+function openModal(type) {
+  if (type==='driver') {
+    document.getElementById('driver-modal-title').textContent='Add Driver';
+    document.getElementById('d-id').value='';
+    ['d-name','d-phone','d-vtype','d-vnum','d-license'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  }
+  document.getElementById('modal-'+type).classList.add('open');
+}
+function closeModal(type) { document.getElementById('modal-'+type).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o) o.classList.remove('open');}));
+
+// ══════════════════════════════════
+// UTILS
+// ══════════════════════════════════
+function fmt(n){ return (parseFloat(n)||0).toLocaleString('en-IN'); }
+function fmtDate(d){ if(!d) return '—'; try{ return new Date(d+'T00:00:00').toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}); } catch{ return d; } }
+function fmtMonth(m){ if(!m) return '—'; try{ const [y,mo]=m.split('-'); return new Date(y,parseInt(mo)-1).toLocaleDateString('en-US',{month:'long',year:'numeric'}); } catch{ return m; } }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg,type){ const t=document.getElementById('toast'); t.textContent=msg; t.className='show '+(type||''); clearTimeout(t._t); t._t=setTimeout(()=>{t.className='';},2500); }
+</script>
+</body>
+</html>
